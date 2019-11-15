@@ -61,11 +61,6 @@ namespace PathGenerator
                     Debug.WriteLine(slin.ToString());
                 }
             }
-
-            foreach (E6POS p in points)
-            {
-                Debug.WriteLine(p.ToString());
-            }
         }
     }
 }
