@@ -14,6 +14,15 @@ namespace PathGenerator
 {
     public partial class Form1 : Form
     {
+        public Size initSize;
+        public Size initButton1;
+        public Size initButton2;
+        public Size initButton3;
+        public Size initTextBox1;
+        public Size initTextBox2;
+        public Point initLocButton3;
+        public Point initLocTextBox2;
+
         private const double Z_VALUE = -5;
         private const double X_SIZE = 330;
         private const double Y_SIZE = 130;
@@ -33,6 +42,15 @@ namespace PathGenerator
         public Form1()
         {
             InitializeComponent();
+            initSize = Size;
+            MinimumSize = Size;
+            initButton1 = button1.Size;
+            initButton2 = button2.Size;
+            initButton3 = button3.Size;
+            initTextBox1 = textBox1.Size;
+            initTextBox2 = textBox2.Size;
+            initLocButton3 = button3.Location;
+            initLocTextBox2 = textBox2.Location;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -103,7 +121,6 @@ namespace PathGenerator
 
             textBox1.Text = stringBuilderSRC.ToString();
             textBox2.Text = stringBuilderDAT.ToString();
-            //Clipboard.SetText(stringBuilderSRC.ToString());
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -114,6 +131,22 @@ namespace PathGenerator
         private void button3_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(textBox2.Text);
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            Size diff = Size - initSize;
+            int halfDiffY = diff.Height / 2;
+            button1.Width = diff.Width + initButton1.Width;
+            textBox1.Width = diff.Width + initTextBox1.Width;
+            textBox2.Width = diff.Width + initTextBox2.Width;
+            button2.Height = halfDiffY + initButton2.Height;
+            button3.Height = halfDiffY + initButton3.Height;
+            textBox1.Height = halfDiffY + initTextBox1.Height;
+            textBox2.Height = halfDiffY + initTextBox2.Height;
+
+            button3.Top = halfDiffY + initLocButton3.Y;
+            textBox2.Top = halfDiffY + initLocTextBox2.Y;
         }
     }
 }
