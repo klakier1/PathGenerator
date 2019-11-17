@@ -51,9 +51,11 @@ namespace PathGenerator
             initTextBox2 = textBox2.Size;
             initLocButton3 = button3.Location;
             initLocTextBox2 = textBox2.Location;
+
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             textBox1.Clear();
             textBox2.Clear();
@@ -123,14 +125,16 @@ namespace PathGenerator
             textBox2.Text = stringBuilderDAT.ToString();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(textBox1.Text);
+            if (textBox1.Text != "")
+                Clipboard.SetText(textBox1.Text);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(textBox2.Text);
+            if (textBox2.Text != "")
+                Clipboard.SetText(textBox2.Text);
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
