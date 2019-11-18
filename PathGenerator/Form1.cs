@@ -28,6 +28,11 @@ namespace PathGenerator
         private const double X_SIZE = 133;
         private const double Y_OFFSET = 24; //po obu stronach, czarne zaczyna sie od 12mm
         private const double Y_START = 0; //tylko na poczatku
+
+        private const int TOOL = 1;
+        private const int BASE = 10;
+
+        //STRIPSE
         private const int LINES = 26;
         private readonly double[] X_POINTS = new double[] { 6, 16, 50, 83, 117, 127 };
         private readonly double[] SPEED = new double[] { 0.5, 0.3, 0.25, 0.15, 0.25, 0.3 };
@@ -36,8 +41,14 @@ namespace PathGenerator
         private const int STOP_GLUE_POINT = 4;
         private const int START_GLUE_POINT = 1;
 
-        private const int TOOL = 1;
-        private const int BASE = 10;
+        //ZIGZAG
+        private const double ZZ_Y_START = 20;
+        private const double ZZ_Y_STOP = 320;
+        private const double ZZ_X_START = 24;
+        private const double ZZ_X_STOP = 110;
+        private const int ZZ_VERTICES = 20;
+        private const double ZZ_SPEED = 0.2;
+
 
         public Form1()
         {
@@ -120,6 +131,69 @@ namespace PathGenerator
             }
 
             stringBuilderDAT.AppendLine(ldat.ToString());
+
+            textBox1.Text = stringBuilderSRC.ToString();
+            textBox2.Text = stringBuilderDAT.ToString();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+
+            StringBuilder stringBuilderSRC = new StringBuilder();
+            StringBuilder stringBuilderDAT = new StringBuilder();
+
+            //genereruj Y
+            double[] y_points = new double[ZZ_VERTICES];
+            double y_spracing = (ZZ_Y_STOP - ZZ_Y_START) / (ZZ_VERTICES - 1);
+            for (int i = 0; i < ZZ_VERTICES; i++)
+            {
+                y_points[i] = ZZ_Y_START + y_spracing * i;
+            }
+
+            LDAT ldat = new LDAT("LL");
+
+            //first point
+            string nameE6POS = String.Format("XKLB_01");
+            string nameFDAT = String.Format("FKLB_01");
+            E6POS e6pos = new E6POS(ZZ_X_START, ZZ_Y_START, Z_VALUE, nameE6POS);
+            FDAT fdat = new FDAT(TOOL, BASE, nameFDAT);
+            SLIN slin = new SLIN_GLUE_ON(ZZ_SPEED, e6pos, fdat, ldat);
+
+            stringBuilderSRC.AppendLine(slin.ToString());
+            stringBuilderDAT.AppendLine(e6pos.ToString());
+            stringBuilderDAT.AppendLine(fdat.ToString());
+
+            //middle points
+            for (int i = 0; i < ZZ_VERTICES; i++)
+            {
+                bool evenOrOdd = (i % 2 == 0);
+                double X = evenOrOdd ? ZZ_X_STOP : ZZ_X_START;
+                double Y = y_points[i];
+
+                nameE6POS = String.Format("XKLB_{0}", (i + 2).ToString("D2"));
+                nameFDAT = String.Format("FKLB_{0}", (i + 2).ToString("D2"));
+                e6pos = new E6POS(X, Y, Z_VALUE, nameE6POS);
+                fdat = new FDAT(TOOL, BASE, nameFDAT);
+                slin = new SLIN(ZZ_SPEED, e6pos, fdat, ldat);
+
+                stringBuilderSRC.AppendLine(slin.ToString());
+                stringBuilderDAT.AppendLine(e6pos.ToString());
+                stringBuilderDAT.AppendLine(fdat.ToString());
+            }
+
+            //last point
+            nameE6POS = String.Format("XKLB_{0}", (ZZ_VERTICES + 2).ToString("D2"));
+            nameFDAT = String.Format("FKLB_{0}", (ZZ_VERTICES + 2).ToString("D2"));
+            e6pos = new E6POS((ZZ_VERTICES % 2 == 0) ? ZZ_X_STOP : ZZ_X_START, ZZ_Y_STOP, Z_VALUE, nameE6POS);
+            fdat = new FDAT(TOOL, BASE, nameFDAT);
+            slin = new SLIN_GLUE_OFF(ZZ_SPEED, e6pos, fdat, ldat);
+            ((SLIN_GLUE_OFF)slin).EndMeasurement = true;
+
+            stringBuilderSRC.AppendLine(slin.ToString());
+            stringBuilderDAT.AppendLine(e6pos.ToString());
+            stringBuilderDAT.AppendLine(fdat.ToString());
 
             textBox1.Text = stringBuilderSRC.ToString();
             textBox2.Text = stringBuilderDAT.ToString();
