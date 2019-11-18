@@ -28,7 +28,7 @@ namespace PathGenerator.Kuka
             //                           ;FOLD SLIN KLB_15_05 CONT Vel=0.1 m/s L GlueOff Distance=0 mm End Measurement=Yes Change Doser=No Tool[1]:GUN_01 Base[10]:WorkBase;%{PE}%R 4.2.10,%MKUKATPGLUE,%CGLUEOFF,%VSLIN_SB,%P 1:SLIN_SB, 2:KLB_15_05, 3:C_SPL, 5:0.1, 7:L, 11:0, 14:#YES, 16:#NO
             string fold = String.Format(";FOLD SLIN {0} CONT Vel={1} m/s {4} GlueOff Distance=0 mm End Measurement={5} Change Doser=No Tool[{2}]:GUN_01 Base[{3}]:WorkBase;%{{PE}}%R 4.2.10,%MKUKATPGLUE,%CGLUEOFF,%VSLIN_SB,%P 1:SLIN_SB, 2:{0}, 3:C_SPL, 5:{1}, 7:{4}, 11:0, 14:{6}, 16:#NO",
                 e6pos.Name.Substring(1),
-                speed.ToString("F1", CultureInfo.InvariantCulture),
+                speed.ToString("F", CultureInfo.InvariantCulture),
                 fdat.Tool_no,
                 fdat.Base_no,
                 ldat.Name.Substring(1),

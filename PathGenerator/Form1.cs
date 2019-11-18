@@ -23,16 +23,16 @@ namespace PathGenerator
         public Point initLocButton3;
         public Point initLocTextBox2;
 
-        private const double Z_VALUE = -5;
-        private const double X_SIZE = 330;
-        private const double Y_SIZE = 130;
-        private const double X_OFFSET = 20; //po obu stronach
+        private const double Z_VALUE = -7;
+        private const double X_SIZE = 340;
+        private const double Y_SIZE = 133;
+        private const double X_OFFSET = 24; //po obu stronach, czarne zaczyna sie od 12mm
         private const double X_START = 0; //tylko na poczatku
-        private const int LINES = 10;
-        private readonly double[] Y_POINTS = new double[] { 17.1, 22, 52, 67, 82, 112, 116.9 };
-        private readonly double[] SPEED = new double[] { 0.5, 0.2, 0.1, 0.1, 0.1, 0.1, 0.2 };
-        private readonly double[] Y_POINTS_REV = new double[] { 17.1, 22, 52, 67, 82, 112, 115.9 }.Reverse().ToArray();
-        private readonly double[] SPEED_REV = new double[] { 0.5, 0.2, 0.1, 0.1, 0.1, 0.1, 0.2 };
+        private const int LINES = 12;
+        private readonly double[] Y_POINTS = new double[] { 19.1, 27, 57, 67, 77, 107, 114.9 };
+        private readonly double[] SPEED = new double[] { 0.5, 0.25, 0.20, 0.1, 0.1, 0.2, 0.25 };
+        private readonly double[] Y_POINTS_REV = new double[] { 19.1, 27, 57, 67, 77, 107, 114.9 }.Reverse().ToArray();
+        private readonly double[] SPEED_REV = new double[] { 0.5, 0.25, 0.20, 0.1, 0.1, 0.2, 0.25 };
         private const int STOP_GLUE_POINT = 5;
         private const int START_GLUE_POINT = 1;
 

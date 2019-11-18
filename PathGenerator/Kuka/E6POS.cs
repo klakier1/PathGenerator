@@ -27,8 +27,8 @@ namespace PathGenerator
 
         override public String ToString()
         {
-            //DECL E6POS XKLB_12_05={X 112.710,Y 267.240,Z -5.01000,A -90.0000,B 0.0,C 180.000,S 6,T 50} 
-            return String.Format("DECL E6POS {0}={{X {1},Y {2},Z {3},A -90.0000,B 0.0,C 180.000,S 6,T 50}}",
+            //DECL E6POS XKLB_12_05={X 112.710,Y 267.240,Z -5.01000,A 90.0000,B 0.0,C 180.000,S 6,T 50} 
+            return String.Format("DECL E6POS {0}={{X {1},Y {2},Z {3},A 90,B 0,C 180,S 6,T 27}}",
                 Name,
                 X.ToString("F5", CultureInfo.InvariantCulture),
                 Y.ToString("F5", CultureInfo.InvariantCulture),
