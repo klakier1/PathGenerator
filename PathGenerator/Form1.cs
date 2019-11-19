@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows;
 
 namespace PathGenerator
 {
@@ -34,18 +35,29 @@ namespace PathGenerator
 
         //STRIPSE
         private const int LINES = 26;
-        private readonly double[] X_POINTS = new double[] { 6, 16, 50, 83, 117, 127 };
-        private readonly double[] SPEED = new double[] { 0.5, 0.3, 0.25, 0.15, 0.25, 0.3 };
-        private readonly double[] X_POINTS_REV = new double[] { 6, 16, 50, 83, 117, 127 }.Reverse().ToArray();
-        private readonly double[] SPEED_REV = new double[] { 0.5, 0.3, 0.25, 0.15, 0.25, 0.3 };
-        private const int STOP_GLUE_POINT = 4;
+        private readonly double[] X_POINTS = new double[] { 6, 31, 100, 127 };
+        private readonly double[] SPEED = new double[] { 0.5, 0.3, 0.1, 0.3 };
+        private readonly double[] X_POINTS_REV = new double[] { 6, 33, 102, 127 }.Reverse().ToArray();
+        private readonly double[] SPEED_REV = new double[] { 0.5, 0.3, 0.1, 0.3 };
+        private const int STOP_GLUE_POINT = 2;
         private const int START_GLUE_POINT = 1;
 
+        //mustache
+        private readonly RobPoint[] MUSTACHE = {
+            new RobPoint(5,7, Z_VALUE, SPEED_MUSTACHE),    //pierwszy punkt przejazdowy
+            new RobPoint(5,5, Z_VALUE, SPEED_MUSTACHE),     //punkt on/off glue
+            new RobPoint(2,2, Z_VALUE, SPEED_MUSTACHE),     //punkt dla testu
+            new RobPoint(1,1, Z_VALUE, SPEED_MUSTACHE)     //i jeszcze jeden dla testu 
+        };
+        private const int STOP_GLUE_POINT_MUSTACHE = 7;
+        private const int START_GLUE_POINT_MUSTACHE = 1;
+        private const double SPEED_MUSTACHE = 0.1;
+
         //ZIGZAG
-        private const double ZZ_Y_START = 20;
-        private const double ZZ_Y_STOP = 320;
-        private const double ZZ_X_START = 24;
-        private const double ZZ_X_STOP = 110;
+        private const double ZZ_Y_START = 24;
+        private const double ZZ_Y_STOP = 316;
+        private const double ZZ_X_START = 16;
+        private const double ZZ_X_STOP = 117;
         private const int ZZ_VERTICES = 20;
         private const double ZZ_SPEED = 0.2;
 
@@ -225,6 +237,122 @@ namespace PathGenerator
 
             button3.Top = halfDiffY + initLocButton3.Y;
             textBox2.Top = halfDiffY + initLocTextBox2.Y;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+
+            StringBuilder stringBuilderSRC = new StringBuilder();
+            StringBuilder stringBuilderDAT = new StringBuilder();
+
+            //4--------2    ^
+            //|        |    |
+            //3--------1    X
+            //
+            //    <- Y
+
+            //generowanie punktów w X            
+            double[] y_points = new double[LINES];
+            double y_spracing = (Y_SIZE - 2.0 * Y_OFFSET - Y_START) / (LINES - 1);
+            for (int i = 0; i < LINES; i++)
+            {
+                y_points[i] = Y_OFFSET + Y_START + y_spracing * i;
+            }
+
+            List<E6POS> points = new List<E6POS>();
+
+            LDAT ldat = new LDAT("LL");
+
+            for (int i = 0; i < LINES; i++)
+            {
+                bool evenOrOdd = (i % 2 == 0);
+                double[] x_points = evenOrOdd ? X_POINTS : X_POINTS_REV; //dla parzysty punkty normalne a nie parzystych odwrotne
+                double[] speed = evenOrOdd ? SPEED : SPEED_REV;
+
+                //jesli pierwsza lub ostania linia zwiedz ilosc punktow w X o 2
+                bool firstLine = i == 0;
+                bool lastLine = i == LINES - 1;
+                int noOfPointsInX = (firstLine || lastLine) ? X_POINTS.Count() + 2 : X_POINTS.Count();
+
+                switch (i)
+                {
+                    case 0:             //pierwsza linia
+                        {
+                            var corner1 = new RobPoint(x_points[0], y_points[0]);
+                            var corner2 = new RobPoint(x_points[x_points.Count() - 1], y_points[0]);
+                            //tablica 
+                            List<RobPoint> firstMustache = new List<RobPoint>();
+                            for (int q = 0; q < MUSTACHE.Count(); q++)
+                            {
+                                //additionalAtBegin[q] = 
+                                var robPoint = new RobPoint(corner1.X - MUSTACHE[q].X, corner1.Y - MUSTACHE[q].Y);
+                            }
+
+                            //generuj wąsa
+                            //foreach (Point p in MUSTACHE)
+                            //{
+                                
+                            //}
+
+                            break;
+                        }
+                    case LINES - 1:     //ostania linia
+                        {
+                            double[] additionalAtBegin = new double[MUSTACHE.Count()];
+                            double[] additionalAtEnd = new double[MUSTACHE.Count()];
+                            break;
+                        }
+                    default:            //kazda inna linia
+                        {
+                            for (int j = 0; j < X_POINTS.Count(); j++)
+                            {
+
+                                string nameE6POS = String.Format("XKLB_{0}_{1}", (i + 1).ToString("D2"), (j + 1).ToString("D2"));
+                                string nameFDAT = String.Format("FKLB_{0}_{1}", (i + 1).ToString("D2"), (j + 1).ToString("D2"));
+                                E6POS e6pos = new E6POS(x_points[j], y_points[i], Z_VALUE, nameE6POS);
+                                FDAT fdat = new FDAT(TOOL, BASE, nameFDAT);
+                                SLIN slin;
+                                switch (j)
+                                {
+                                    case START_GLUE_POINT:
+                                        {
+                                            slin = new SLIN_GLUE_ON(speed[j], e6pos, fdat, ldat);
+                                            break;
+                                        }
+                                    case STOP_GLUE_POINT:
+                                        {
+                                            bool endMeas = (i == LINES - 1) ? true : false; //na ostaniej linii wylacz pomiar
+                                            slin = new SLIN_GLUE_OFF(speed[j], e6pos, fdat, ldat);
+                                            ((SLIN_GLUE_OFF)slin).EndMeasurement = endMeas;
+                                            break;
+                                        }
+                                    default:
+                                        {
+                                            slin = new SLIN(speed[j], e6pos, fdat, ldat);
+                                            break;
+                                        }
+                                }
+                                points.Add(e6pos);
+
+                                //Debug.WriteLine(e6pos.ToString());
+                                stringBuilderSRC.AppendLine(slin.ToString());
+                                stringBuilderDAT.AppendLine(e6pos.ToString());
+                                stringBuilderDAT.AppendLine(fdat.ToString());
+                            }
+                            break;
+                        }
+                }
+
+                stringBuilderSRC.AppendLine();
+                stringBuilderDAT.AppendLine();
+            }
+
+            stringBuilderDAT.AppendLine(ldat.ToString());
+
+            textBox1.Text = stringBuilderSRC.ToString();
+            textBox2.Text = stringBuilderDAT.ToString();
         }
     }
 }
