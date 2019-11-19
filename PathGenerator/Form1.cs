@@ -27,7 +27,7 @@ namespace PathGenerator
         private const double Z_VALUE = -10;
         private const double Y_SIZE = 340;
         private const double X_SIZE = 133;
-        private const double Y_OFFSET = 24; //po obu stronach, czarne zaczyna sie od 12mm
+        private const double Y_OFFSET = 24; //po obu stronach, czarne zaczyna sie od 12mm 
         private const double Y_START = 0; //tylko na poczatku
 
         private const int TOOL = 1;
