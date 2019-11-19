@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace PathGenerator
 {
@@ -57,6 +58,8 @@ namespace PathGenerator
         private const int ZZ_VERTICES = 20;
         private const double ZZ_SPEED = 0.2;
 
+        int seria = 0;
+
 
         public Form1()
         {
@@ -72,6 +75,17 @@ namespace PathGenerator
             initLocTextBox2 = textBox2.Location;
 
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
+
+            chart1.ChartAreas[0].AxisY.ScaleView.Zoom(-10, 340);
+            chart1.ChartAreas[0].AxisX.ScaleView.Zoom(-10, 140);
+            //chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            //chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
+            //chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            Series s = new Series("First");
+            chart1.Series.Add(s);
+            chart1.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -279,11 +293,15 @@ namespace PathGenerator
                                 E6POS e6pos = new E6POS(X_POINTS_MUSTACH[j], refY - Y_POINTS_MUSTACH[j], Z_VALUE, nameE6POS);
                                 FDAT fdat = new FDAT(TOOL, BASE, nameFDAT);
                                 SLIN slin;
+                                
                                 switch (j)
                                 {
                                     case START_GLUE_POINT_MUSTACHE:
                                         {
                                             slin = new SLIN_GLUE_ON(SPEED_MUSTACH[j], e6pos, fdat, ldat);
+                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
+                                            seria = 1;
+                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                     case STOP_GLUE_POINT_MUSTACHE:
@@ -291,11 +309,15 @@ namespace PathGenerator
                                             bool endMeas = (i == LINES - 1) ? true : false; //na ostaniej linii wylacz pomiar
                                             slin = new SLIN_GLUE_OFF(SPEED_MUSTACH[j], e6pos, fdat, ldat);
                                             ((SLIN_GLUE_OFF)slin).EndMeasurement = endMeas;
+                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
+                                            seria = 0;
+                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                     default:
                                         {
                                             slin = new SLIN(SPEED_MUSTACH[j], e6pos, fdat, ldat);
+                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                 }
@@ -320,6 +342,7 @@ namespace PathGenerator
                                 E6POS e6pos = new E6POS(x_points_mustach[j], refY + Y_POINTS_MUSTACH[j], Z_VALUE, nameE6POS);
                                 FDAT fdat = new FDAT(TOOL, BASE, nameFDAT);
                                 SLIN slin;
+                                chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
                                 switch (j)
                                 {
                                     case START_GLUE_POINT_MUSTACHE:
@@ -359,6 +382,7 @@ namespace PathGenerator
                                 E6POS e6pos = new E6POS(x_points[j], y_points[i], Z_VALUE, nameE6POS);
                                 FDAT fdat = new FDAT(TOOL, BASE, nameFDAT);
                                 SLIN slin;
+                                chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
                                 switch (j)
                                 {
                                     case START_GLUE_POINT:
@@ -398,6 +422,16 @@ namespace PathGenerator
 
             textBox1.Text = stringBuilderSRC.ToString();
             textBox2.Text = stringBuilderDAT.ToString();
+        }
+
+        private void chart1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
