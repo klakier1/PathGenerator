@@ -36,15 +36,16 @@ namespace PathGenerator
 
         //STRIPSE
         private const int LINES = 26;
-        private readonly double[] X_POINTS = new double[] { 6, 31, 100, 127 };
+        private readonly double[] X_POINTS = new double[] { 6, 30, 99, 127 };
         private readonly double[] SPEED = new double[] { 0.5, 0.3, 0.1, 0.3 };
-        private readonly double[] X_POINTS_REV = new double[] { 6, 33, 102, 127 }.Reverse().ToArray();
+        private readonly double[] X_POINTS_REV = new double[] { 6, 32, 101, 127 }.Reverse().ToArray();
         private readonly double[] SPEED_REV = new double[] { 0.5, 0.3, 0.1, 0.3 };
         private const int STOP_GLUE_POINT = 2;
         private const int START_GLUE_POINT = 1;
 
         //mustache
-        private readonly double[] X_POINTS_MUSTACH = new double[] { 6, 12, 31, 46, 85, 100, 119, 127 };
+        private readonly double[] X_POINTS_MUSTACH = new double[] { 5, 12, 31, 46, 85, 100, 118, 127 };
+        private readonly double[] X_POINTS_MUSTACH_REV = new double[] { 6, 13, 31, 46, 85, 100, 119, 127 };
         private readonly double[] Y_POINTS_MUSTACH = new double[] { 15, 10, 3, 0, 0, 3, 10, 15 };  //
         private readonly double[] SPEED_MUSTACH = new double[] { 0.5, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3 };
         private const int STOP_GLUE_POINT_MUSTACHE = 6;
@@ -235,7 +236,7 @@ namespace PathGenerator
             button3.Top = halfDiffY + initLocButton3.Y;
             textBox2.Top = halfDiffY + initLocTextBox2.Y;
         }
-    
+
         private void button5_Click(object sender, EventArgs e)
         {
             MustachVer2();
@@ -453,17 +454,38 @@ namespace PathGenerator
             //pierwszy linia was
             double[] Y_1stLine = (double[])Y_POINTS_MUSTACH.Clone();
             for (int i = 0; i < Y_1stLine.Count(); i++)
-                Y_1stLine[i] = Ys[0] - Y_1stLine[i];           
+                Y_1stLine[i] = Ys[0] - Y_1stLine[i];
             generator.LineFromXYVArray(X_POINTS_MUSTACH, Y_1stLine, Z_VALUE, SPEED_MUSTACH, START_GLUE_POINT_MUSTACHE, STOP_GLUE_POINT_MUSTACHE);
 
+            //druga linia, dluzsza o 6mm
+            double[] X_2stLine = (double[])X_POINTS_REV.Clone();
+            X_2stLine[1] += 6;
+            X_2stLine[X_2stLine.Count() - 2] -= 7;
+            generator.LineFromXVArray(X_2stLine, Ys[1], Z_VALUE, SPEED, START_GLUE_POINT, STOP_GLUE_POINT);
+
             //srodkowe linie
-            double[] Y_forMatrix = new double[LINES - 2];
-            Array.Copy(Ys, 1, Y_forMatrix, 0, LINES - 2);
-            generator.MatrixFromXYVArray(X_POINTS, X_POINTS_REV, Y_forMatrix, Z_VALUE, SPEED, SPEED_REV, START_GLUE_POINT, STOP_GLUE_POINT, false);
+            double[] Y_forMatrix = new double[LINES - 4];
+            Array.Copy(Ys, 2, Y_forMatrix, 0, LINES - 4);
+            generator.MatrixFromXYVArray(X_POINTS, X_POINTS_REV, Y_forMatrix, Z_VALUE, SPEED, SPEED_REV, START_GLUE_POINT, STOP_GLUE_POINT, true);
+
+            //przedostatnia, dluzsza o 6mm
+            double[] X_PreLastLine = generator.IsNextLineEven() ? (double[])X_POINTS.Clone() : (double[])X_POINTS_REV.Clone();
+            double[] PreLastLineSpeed = generator.IsNextLineEven() ? (double[])SPEED.Clone() : (double[])SPEED_REV.Clone();
+            if (generator.IsNextLineEven())
+            {
+                X_PreLastLine[1] -=7;
+                X_PreLastLine[X_PreLastLine.Count() - 2] += 6;
+            }
+            else
+            {
+                X_PreLastLine[1] += 6;
+                X_PreLastLine[X_PreLastLine.Count() - 2] -= 6;
+            }
+            generator.LineFromXVArray(X_PreLastLine, Ys[Ys.Count() - 2], Z_VALUE, PreLastLineSpeed, START_GLUE_POINT, STOP_GLUE_POINT);
 
             //ostania linia was
             double[] Y_LastLine = generator.IsNextLineEven() ? (double[])Y_POINTS_MUSTACH.Clone() : ((double[])Y_POINTS_MUSTACH.Clone()).Reverse().ToArray();
-            double[] X_LastLine = generator.IsNextLineEven() ? (double[])X_POINTS_MUSTACH.Clone() : ((double[])X_POINTS_MUSTACH.Clone()).Reverse().ToArray();
+            double[] X_LastLine = generator.IsNextLineEven() ? (double[])X_POINTS_MUSTACH_REV.Clone() : ((double[])X_POINTS_MUSTACH_REV.Clone()).Reverse().ToArray();
             for (int i = 0; i < Y_LastLine.Count(); i++)
                 Y_LastLine[i] = Ys[Ys.Count() - 1] + Y_LastLine[i];
             generator.LineFromXYVArray(X_LastLine, Y_LastLine, Z_VALUE, SPEED_MUSTACH, START_GLUE_POINT_MUSTACHE, STOP_GLUE_POINT_MUSTACHE);
