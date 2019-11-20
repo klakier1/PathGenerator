@@ -83,7 +83,6 @@
             this.textBox1.Size = new System.Drawing.Size(642, 194);
             this.textBox1.TabIndex = 3;
             this.textBox1.WordWrap = false;
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // textBox2
             // 
@@ -133,7 +132,6 @@
             this.chart1.Size = new System.Drawing.Size(455, 393);
             this.chart1.TabIndex = 7;
             this.chart1.Text = "chart1";
-            this.chart1.Click += new System.EventHandler(this.chart1_Click);
             // 
             // Form1
             // 

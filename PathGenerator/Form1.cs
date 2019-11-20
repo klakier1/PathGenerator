@@ -44,8 +44,8 @@ namespace PathGenerator
         private const int START_GLUE_POINT = 1;
 
         //mustache
-        private readonly double[] X_POINTS_MUSTACH = new double[] { 6, 28, 31, 46, 85, 100, 103, 127 };
-        private readonly double[] Y_POINTS_MUSTACH = new double[] { 15, 10, 5, 0, 0, 5, 10, 15 };  //
+        private readonly double[] X_POINTS_MUSTACH = new double[] { 6, 12, 31, 46, 85, 100, 119, 127 };
+        private readonly double[] Y_POINTS_MUSTACH = new double[] { 15, 10, 3, 0, 0, 3, 10, 15 };  //
         private readonly double[] SPEED_MUSTACH = new double[] { 0.5, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.3 };
         private const int STOP_GLUE_POINT_MUSTACHE = 6;
         private const int START_GLUE_POINT_MUSTACHE = 1;
@@ -57,8 +57,6 @@ namespace PathGenerator
         private const double ZZ_X_STOP = 117;
         private const int ZZ_VERTICES = 20;
         private const double ZZ_SPEED = 0.2;
-
-        int seria = 0;
 
 
         public Form1()
@@ -75,17 +73,6 @@ namespace PathGenerator
             initLocTextBox2 = textBox2.Location;
 
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
-
-            chart1.ChartAreas[0].AxisY.ScaleView.Zoom(-10, 340);
-            chart1.ChartAreas[0].AxisX.ScaleView.Zoom(-10, 140);
-            //chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
-            //chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
-            //chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
-            chart1.Series[0].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            Series s = new Series("First");
-            chart1.Series.Add(s);
-            chart1.Series[1].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -248,8 +235,13 @@ namespace PathGenerator
             button3.Top = halfDiffY + initLocButton3.Y;
             textBox2.Top = halfDiffY + initLocTextBox2.Y;
         }
-
+    
         private void button5_Click(object sender, EventArgs e)
+        {
+            MustachVer2();
+        }
+
+        private void MustachVer1()
         {
             textBox1.Clear();
             textBox2.Clear();
@@ -257,7 +249,7 @@ namespace PathGenerator
             StringBuilder stringBuilderSRC = new StringBuilder();
             StringBuilder stringBuilderDAT = new StringBuilder();
 
-
+            bool glueOn = false;
 
             //generowanie punktów w X            
             double[] y_points = new double[LINES];
@@ -293,15 +285,18 @@ namespace PathGenerator
                                 E6POS e6pos = new E6POS(X_POINTS_MUSTACH[j], refY - Y_POINTS_MUSTACH[j], Z_VALUE, nameE6POS);
                                 FDAT fdat = new FDAT(TOOL, BASE, nameFDAT);
                                 SLIN slin;
-                                
+
                                 switch (j)
                                 {
                                     case START_GLUE_POINT_MUSTACHE:
                                         {
                                             slin = new SLIN_GLUE_ON(SPEED_MUSTACH[j], e6pos, fdat, ldat);
-                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
-                                            seria = 1;
-                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
+                                            glueOn = true;
+                                            DataPoint qwe = new DataPoint(e6pos.X, e6pos.Y);
+                                            qwe.Name = "qwewerewqrergergrdesgg";
+                                            chart1.Series[0].Points.Add(qwe);
+
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                     case STOP_GLUE_POINT_MUSTACHE:
@@ -309,15 +304,17 @@ namespace PathGenerator
                                             bool endMeas = (i == LINES - 1) ? true : false; //na ostaniej linii wylacz pomiar
                                             slin = new SLIN_GLUE_OFF(SPEED_MUSTACH[j], e6pos, fdat, ldat);
                                             ((SLIN_GLUE_OFF)slin).EndMeasurement = endMeas;
-                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
-                                            seria = 0;
-                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
+
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
+                                            glueOn = false;
                                             break;
                                         }
                                     default:
                                         {
                                             slin = new SLIN(SPEED_MUSTACH[j], e6pos, fdat, ldat);
-                                            chart1.Series[seria].Points.AddXY(e6pos.X, e6pos.Y);
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                 }
@@ -348,6 +345,9 @@ namespace PathGenerator
                                     case START_GLUE_POINT_MUSTACHE:
                                         {
                                             slin = new SLIN_GLUE_ON(SPEED_MUSTACH[j], e6pos, fdat, ldat);
+                                            glueOn = true;
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                     case STOP_GLUE_POINT_MUSTACHE:
@@ -355,11 +355,18 @@ namespace PathGenerator
                                             bool endMeas = (i == LINES - 1) ? true : false; //na ostaniej linii wylacz pomiar
                                             slin = new SLIN_GLUE_OFF(SPEED_MUSTACH[j], e6pos, fdat, ldat);
                                             ((SLIN_GLUE_OFF)slin).EndMeasurement = endMeas;
+
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
+                                            glueOn = false;
                                             break;
                                         }
                                     default:
                                         {
                                             slin = new SLIN(SPEED_MUSTACH[j], e6pos, fdat, ldat);
+
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                 }
@@ -388,6 +395,9 @@ namespace PathGenerator
                                     case START_GLUE_POINT:
                                         {
                                             slin = new SLIN_GLUE_ON(speed[j], e6pos, fdat, ldat);
+                                            glueOn = true;
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                     case STOP_GLUE_POINT:
@@ -395,11 +405,18 @@ namespace PathGenerator
                                             bool endMeas = (i == LINES - 1) ? true : false; //na ostaniej linii wylacz pomiar
                                             slin = new SLIN_GLUE_OFF(speed[j], e6pos, fdat, ldat);
                                             ((SLIN_GLUE_OFF)slin).EndMeasurement = endMeas;
+
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
+                                            glueOn = false;
                                             break;
                                         }
                                     default:
                                         {
                                             slin = new SLIN(speed[j], e6pos, fdat, ldat);
+
+                                            chart1.Series[0].Points.AddXY(e6pos.X, e6pos.Y);
+                                            if (glueOn) chart1.Series[1].Points.AddXY(e6pos.X, e6pos.Y);
                                             break;
                                         }
                                 }
@@ -412,6 +429,7 @@ namespace PathGenerator
                             }
                             break;
                         }
+
                 }
 
                 stringBuilderSRC.AppendLine();
@@ -424,14 +442,50 @@ namespace PathGenerator
             textBox2.Text = stringBuilderDAT.ToString();
         }
 
-        private void chart1_Click(object sender, EventArgs e)
+        private void MustachVer2()
         {
+            Generator generator = new Generator();
+
+            double[] Ys = GetRange(Y_START + Y_OFFSET, Y_SIZE - Y_OFFSET, LINES);
+            //           foreach (var e in Ys)
+            //               Debug.WriteLine(e);
+
+            //pierwszy linia was
+            double[] Y_1stLine = (double[])Y_POINTS_MUSTACH.Clone();
+            for (int i = 0; i < Y_1stLine.Count(); i++)
+                Y_1stLine[i] = Ys[0] - Y_1stLine[i];           
+            generator.LineFromXYVArray(X_POINTS_MUSTACH, Y_1stLine, Z_VALUE, SPEED_MUSTACH, START_GLUE_POINT_MUSTACHE, STOP_GLUE_POINT_MUSTACHE);
+
+            //srodkowe linie
+            double[] Y_forMatrix = new double[LINES - 2];
+            Array.Copy(Ys, 1, Y_forMatrix, 0, LINES - 2);
+            generator.MatrixFromXYVArray(X_POINTS, X_POINTS_REV, Y_forMatrix, Z_VALUE, SPEED, SPEED_REV, START_GLUE_POINT, STOP_GLUE_POINT, false);
+
+            //ostania linia was
+            double[] Y_LastLine = generator.IsNextLineEven() ? (double[])Y_POINTS_MUSTACH.Clone() : ((double[])Y_POINTS_MUSTACH.Clone()).Reverse().ToArray();
+            double[] X_LastLine = generator.IsNextLineEven() ? (double[])X_POINTS_MUSTACH.Clone() : ((double[])X_POINTS_MUSTACH.Clone()).Reverse().ToArray();
+            for (int i = 0; i < Y_LastLine.Count(); i++)
+                Y_LastLine[i] = Ys[Ys.Count() - 1] + Y_LastLine[i];
+            generator.LineFromXYVArray(X_LastLine, Y_LastLine, Z_VALUE, SPEED_MUSTACH, START_GLUE_POINT_MUSTACHE, STOP_GLUE_POINT_MUSTACHE);
+
+            generator.GenerateProgram(TOOL, BASE);
+            textBox1.Text = generator.GetSRC();
+            textBox2.Text = generator.GetDAT();
+
+            generator.DrawChart(chart1);
 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private double[] GetRange(double from, double to, int steps)
         {
-
+            //generowanie punktów w X            
+            double[] y_points = new double[steps];
+            double y_spracing = (to - from) / (steps - 1);
+            for (int i = 0; i < steps; i++)
+            {
+                y_points[i] = from + y_spracing * i;
+            }
+            return y_points;
         }
     }
 }

@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generator.cs" />
     <Compile Include="Kuka\E6POS.cs" />
     <Compile Include="Kuka\FDAT.cs" />
     <Compile Include="Form1.cs">
