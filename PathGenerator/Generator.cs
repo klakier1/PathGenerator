@@ -32,10 +32,29 @@ namespace PathGenerator
             program.Add(line);
         }
 
+        public void LineFromXYZVArray(double[] X, double[] Y, double[] Z, double[] speed, int startGlue, int stopGlue)
+        {
+            var line = new List<RobPoint>();
+            for (int i = 0; i < X.Count(); i++)
+            {
+
+                var func = GetGlueFunc(i, startGlue, stopGlue);
+                var p = new RobPoint(X[i], Y[i], Z[i], speed[i], func);
+                line.Add(p);
+            }
+            program.Add(line);
+        }
+
         public void LineFromXVArray(double[] X, double Y, double Z, double[] speed, int startGlue, int stopGlue)
         {
             double[] Ys = Enumerable.Repeat<double>(Y, X.Count()).ToArray();
             LineFromXYVArray(X, Ys, Z, speed, startGlue, stopGlue);
+        }
+
+        public void LineFromXZVArray(double[] X, double Y, double[] Z, double[] speed, int startGlue, int stopGlue)
+        {
+            double[] Ys = Enumerable.Repeat<double>(Y, X.Count()).ToArray();
+            LineFromXYZVArray(X, Ys, Z, speed, startGlue, stopGlue);
         }
 
         public void MatrixFromXYVArray(double[] X, double[] X_rev, double[] Y, double Z, double[] speed, double[] speed_rev, int startGlue, int stopGlue, bool forward)
@@ -49,6 +68,21 @@ namespace PathGenerator
                 double[] Vs = evenOrOdd ? speed : speed_rev;
 
                 LineFromXVArray(Xs, Y[i], Z, Vs, startGlue, stopGlue);
+            }
+        }
+
+        public void MatrixFromXYZVArray(double[] X, double[] X_rev, double[] Y, double[] Z, double[] Z_rev, double[] speed, double[] speed_rev, int startGlue, int stopGlue, bool forward)
+        {
+            for (int i = 0; i < Y.Count(); i++)
+            {
+                bool evenOrOdd = (i % 2 == 0);
+                if (!forward) evenOrOdd = !evenOrOdd;
+
+                double[] Xs = evenOrOdd ? X : X_rev;
+                double[] Vs = evenOrOdd ? speed : speed_rev;
+                double[] Zs = evenOrOdd ? Z : Z_rev;
+
+                LineFromXZVArray(Xs, Y[i], Zs, Vs, startGlue, stopGlue);
             }
         }
 
